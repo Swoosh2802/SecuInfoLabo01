@@ -10,24 +10,22 @@ import java.util.Base64;
 
 //https://www.youtube.com/watch?v=1QJ2TMtBUtc&ab_channel=IndianServersUniversity
 public class ThreeDesImplementation {
-    private static final String UNICODE_Format = "UTF-8";
     private KeySpec ks;
     private SecretKeyFactory skf;
-    private Cipher cipher;
     private String myEncryptionKey;
-    Key key;
+    private Key key;
 
     public ThreeDesImplementation() throws Exception {
         myEncryptionKey = "cledetest";
-        ks =  new DESKeySpec(myEncryptionKey.getBytes(UNICODE_Format));
-        skf = SecretKeyFactory.getInstance("DES");
-        cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
-        key = skf.generateSecret(ks);
+        this.skf = SecretKeyFactory.getInstance("DES");
+        this.ks =  new DESKeySpec(myEncryptionKey.getBytes());
+        this.key = skf.generateSecret(ks);
     }
 
     public String encrypt(String unencryptedString) {
         String encryptedString = null;
         try {
+            Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, key);
             String textToCrypt = Base64.getEncoder().encodeToString(unencryptedString.getBytes());
             byte[] encryptedText = cipher.doFinal(textToCrypt.getBytes());
@@ -41,6 +39,7 @@ public class ThreeDesImplementation {
     public String decrypt(String encryptedString) {
         String decryptedText = null;
         try {
+            Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, key);
             byte[] decodedBytes = cipher.doFinal(encryptedString.getBytes());
             byte[] encValue = Base64.getDecoder().decode(decodedBytes);
