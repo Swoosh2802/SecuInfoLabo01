@@ -1,10 +1,17 @@
 package Implementations;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
+import javax.crypto.spec.IvParameterSpec;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
@@ -22,33 +29,26 @@ public class ThreeDesImplementation {
         this.key = skf.generateSecret(ks);
     }
 
-    public String encrypt(String unencryptedString) {
-        String encryptedString = null;
+    public String encrypt(String unencryptedString) throws Exception{
         try {
             Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, key);
-            String textToCrypt = Base64.getEncoder().encodeToString(unencryptedString.getBytes());
-            byte[] encryptedText = cipher.doFinal(textToCrypt.getBytes());
-            encryptedString = new String(encryptedText);
-        } catch (Exception e) {
+            byte[] encryptedBytes = cipher.doFinal(unencryptedString.getBytes("UTF-8"));
+            return Base64.getEncoder().encodeToString(encryptedBytes);
+        } catch (NoSuchAlgorithmException
+                | NoSuchPaddingException | InvalidKeyException e) {
             e.printStackTrace();
+            return "";
         }
-        return encryptedString;
     }
 
-    public String decrypt(String encryptedString) {
-        String decryptedText = null;
-        try {
-            Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, key);
-            byte[] decodedBytes = cipher.doFinal(encryptedString.getBytes());
-            byte[] encValue = Base64.getDecoder().decode(decodedBytes);
-            decryptedText = new String(encValue);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return decryptedText;
-    }
+    public String decrypt(String encryptedString) throws Exception {
+        byte[] dataInBytes = Base64.getDecoder().decode(encryptedString);
+        Cipher decryptionCipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
+        decryptionCipher.init(Cipher.DECRYPT_MODE, key);
+        byte[] decryptedBytes = decryptionCipher.doFinal(dataInBytes);
+        return new String(decryptedBytes,"UTF-8");
+}
 
     public static void main(String args[]) throws Exception {
         ThreeDesImplementation td = new ThreeDesImplementation();
