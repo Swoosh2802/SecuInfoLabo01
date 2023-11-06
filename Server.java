@@ -27,6 +27,7 @@ public class Server {
         PrivateKey decryptPrivateKey;
         SecretKey aesDecryptKey = null; 
         byte[] iv = new byte[16];
+        Cipher decryptionCipher;
 
         
         decryptKeyPairGenerator = KeyPairGenerator.getInstance("DH");
@@ -55,6 +56,11 @@ public class Server {
         try (Socket server = new Socket("localhost", 4202)) {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(server.getOutputStream());
             objectOutputStream.writeObject(decryptPublicKey);
+            decryptionCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            IvParameterSpec parameterSpec = new IvParameterSpec(iv);
+            decryptionCipher.init(Cipher.DECRYPT_MODE, aesDecryptKey, parameterSpec);
+            
+            objectOutputStream.writeObject(parameterSpec.getIV());
             objectOutputStream.close();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -85,10 +91,12 @@ public class Server {
                     } else if(receivedMessage.substring(0,receivedMessage.indexOf(":")).equals("AES")){
                         String message = receivedMessage.substring(receivedMessage.indexOf(":")+1);
                         byte[] dataInBytes = Base64.getDecoder().decode(message);
-                        Cipher decryptionCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                        decryptionCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
                         decryptionCipher.init(Cipher.DECRYPT_MODE, aesDecryptKey, new IvParameterSpec(iv));
                         byte[] decryptedBytes = decryptionCipher.doFinal(dataInBytes);
+                        
                         System.out.println(new String(decryptedBytes,"UTF-8"));
+                        //TODO AJOUTER HMAC ET ENVOYER LE SHA1 DE L'AUTRE COTE
                     }
                 }else{
                     SHA1Implementation sha1Implementation = new SHA1Implementation();
