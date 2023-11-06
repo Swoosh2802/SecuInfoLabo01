@@ -3,10 +3,10 @@ package Implementations;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-public class HMAC {
+public class HMACMD5 {
     String cle_privee;
 
-    public HMAC(){
+    public HMACMD5(){
         this.cle_privee = "MaCleSecrete";
     }
 

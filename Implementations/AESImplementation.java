@@ -22,7 +22,7 @@ import javax.crypto.KeyAgreement;
 //https://www.section.io/engineering-education/implementing-aes-encryption-and-decryption-in-java/
 
 public class AESImplementation {
-    private SecretKey cle_privee;
+    private SecretKey encrypt_Key;
     private PublicKey encryptPublicKey;
     private PublicKey decryptPublicKey;
     KeyPairGenerator encryptKeyPairGenerator;
@@ -51,17 +51,14 @@ public class AESImplementation {
         KeyAgreement keyAgreement2 = KeyAgreement.getInstance("DH");
         keyAgreement2.init(decryptPrivateKey);
         keyAgreement2.doPhase(encryptPublicKey, true);
-
-        /*System.out.println(new String(keyAgreement.generateSecret()));
-        System.out.println(new String(keyAgreement2.generateSecret()));*/
         
-        this.cle_privee = new SecretKeySpec(keyAgreement.generateSecret(),0, 16, "AES");
+        this.encrypt_Key = new SecretKeySpec(keyAgreement.generateSecret(),0, 16, "AES");
     }
 
     public String encrypt(String text) throws UnsupportedEncodingException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
         try {
             Cipher encryptionCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            encryptionCipher.init(Cipher.ENCRYPT_MODE, this.cle_privee, new IvParameterSpec(iv));
+            encryptionCipher.init(Cipher.ENCRYPT_MODE, this.encrypt_Key, new IvParameterSpec(iv));
             byte[] encryptedBytes = encryptionCipher.doFinal(text.getBytes("UTF-8"));
             System.out.println(Base64.getEncoder().encodeToString(encryptedBytes));
             return Base64.getEncoder().encodeToString(encryptedBytes);
@@ -75,7 +72,7 @@ public class AESImplementation {
     public String decrypt(String encryptedData) throws Exception {
         byte[] dataInBytes = Base64.getDecoder().decode(encryptedData);
         Cipher decryptionCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        decryptionCipher.init(Cipher.DECRYPT_MODE, this.cle_privee, new IvParameterSpec(iv));
+        decryptionCipher.init(Cipher.DECRYPT_MODE, this.encrypt_Key, new IvParameterSpec(iv));
         byte[] decryptedBytes = decryptionCipher.doFinal(dataInBytes);
         return new String(decryptedBytes,"UTF-8");
     }
