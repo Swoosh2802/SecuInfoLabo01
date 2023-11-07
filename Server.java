@@ -101,7 +101,7 @@ public class Server {
                         HMACMD5 hmac = new HMACMD5();
                         String calculatedHMAC = hmac.calculateHMAC(messageWithNoHMAC);
 
-                         if (receivedHMAC.equals(calculatedHMAC)) {
+                        if (receivedHMAC.equals(calculatedHMAC)) {
                             System.out.println("Expéditeur authentifié par HMAC-MD5 : " + messageWithNoHMAC);
                         } else {
                             System.out.println("Expéditeur non authentifié !");

@@ -31,6 +31,9 @@ public class Client {
     byte[] iv;
     Cipher encryptionCipher;
 
+    public static void main(String[] args) throws Exception {
+        new Client();
+    }
 
     public Client() throws Exception {
         console = System.console();
@@ -90,28 +93,28 @@ public class Client {
         HMACMD5 hmac;
         String calculatedHMAC;
         String toCypher = console.readLine("Entrez le texte à chiffrer\n");
+        hmac = new HMACMD5();
+        calculatedHMAC = hmac.calculateHMAC(toCypher); //Ajout de l'authentification HMAC-MD5
+        toCypher = toCypher+calculatedHMAC; //Ajout de l'authentification HMAC-MD5
         switch (algorithm) {
                 case "1":
-                    hmac = new HMACMD5();
-                    calculatedHMAC = hmac.calculateHMAC(toCypher); //Ajout de l'authentification HMAC-MD5
-                    toCypher = toCypher+calculatedHMAC; //Ajout de l'authentification HMAC-MD5
                     String ciphered = tripleDes.encrypt(toCypher);
                     sendMessage("3DE:"+ciphered);
                     sendMessage(sha1Implementation.sha1Hash("3DE:"+ciphered)); //Envoi du Hash SHA-1
+                    break;
                 case "2":
-                    hmac = new HMACMD5();
-                    calculatedHMAC = hmac.calculateHMAC(toCypher); //Ajout de l'authentification HMAC-MD5
-                    toCypher = toCypher+calculatedHMAC; //Ajout de l'authentification HMAC-MD5
-
                     byte[] encryptedBytes = encryptionCipher.doFinal(toCypher.getBytes("UTF-8"));
                     String encryptedText = Base64.getEncoder().encodeToString(encryptedBytes);
                     
                     sendMessage("AES:"+encryptedText);
                     sendMessage(sha1Implementation.sha1Hash("AES:"+encryptedText));
+                    break;
                 default:
                     choosenAlgorithm(console.readLine("Quel algorithme utilisez-vous?\n 1) 3DES \n 2) AES \n"));
+                    break;
             }
     }
+    
     public void sendMessage(String message) throws Exception {
         try (Socket server = new Socket("localhost", 4200)) {
             PrintWriter toServer = new PrintWriter(

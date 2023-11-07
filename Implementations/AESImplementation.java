@@ -60,7 +60,6 @@ public class AESImplementation {
             Cipher encryptionCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             encryptionCipher.init(Cipher.ENCRYPT_MODE, this.encrypt_Key, new IvParameterSpec(iv));
             byte[] encryptedBytes = encryptionCipher.doFinal(text.getBytes("UTF-8"));
-            System.out.println(Base64.getEncoder().encodeToString(encryptedBytes));
             return Base64.getEncoder().encodeToString(encryptedBytes);
         } catch (NoSuchAlgorithmException
                 | NoSuchPaddingException | InvalidKeyException e) {
