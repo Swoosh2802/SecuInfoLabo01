@@ -92,22 +92,29 @@ public class Client {
     public void choosenAlgorithm(String algorithm) throws Exception{
         HMACMD5 hmac;
         String calculatedHMAC;
-        String toCypher = console.readLine("Entrez le texte à chiffrer\n");
-        hmac = new HMACMD5();
-        calculatedHMAC = hmac.calculateHMAC(toCypher); //Ajout de l'authentification HMAC-MD5
-        toCypher = toCypher+calculatedHMAC; //Ajout de l'authentification HMAC-MD5
+        String toCypher ="";
         switch (algorithm) {
                 case "1":
+                    toCypher = console.readLine("Entrez le texte à chiffrer\n");
+                    hmac = new HMACMD5();
+                    calculatedHMAC = hmac.calculateHMAC(toCypher); //Ajout de l'authentification HMAC-MD5
+                    toCypher = toCypher+calculatedHMAC; //Ajout de l'authentification HMAC-MD5
                     String ciphered = tripleDes.encrypt(toCypher);
                     sendMessage("3DE:"+ciphered);
                     sendMessage(sha1Implementation.sha1Hash("3DE:"+ciphered)); //Envoi du Hash SHA-1
+                    System.out.println("message envoyé");
                     break;
                 case "2":
+                    toCypher = console.readLine("Entrez le texte à chiffrer\n");
+                    hmac = new HMACMD5();
+                    calculatedHMAC = hmac.calculateHMAC(toCypher); //Ajout de l'authentification HMAC-MD5
+                    toCypher = toCypher+calculatedHMAC; //Ajout de l'authentification HMAC-MD5
                     byte[] encryptedBytes = encryptionCipher.doFinal(toCypher.getBytes("UTF-8"));
                     String encryptedText = Base64.getEncoder().encodeToString(encryptedBytes);
                     
                     sendMessage("AES:"+encryptedText);
                     sendMessage(sha1Implementation.sha1Hash("AES:"+encryptedText));
+                    System.out.println("message envoyé");
                     break;
                 default:
                     choosenAlgorithm(console.readLine("Quel algorithme utilisez-vous?\n 1) 3DES \n 2) AES \n"));
