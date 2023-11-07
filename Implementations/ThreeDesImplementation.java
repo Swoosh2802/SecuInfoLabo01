@@ -10,7 +10,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.KeySpec;
 import java.util.Base64;
 
-//https://www.youtube.com/watch?v=1QJ2TMtBUtc&ab_channel=IndianServersUniversity
 public class ThreeDesImplementation {
     private KeySpec ks;
     private SecretKeyFactory skf;

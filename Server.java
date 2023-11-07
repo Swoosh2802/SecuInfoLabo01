@@ -94,18 +94,25 @@ public class Server {
                         decryptionCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
                         decryptionCipher.init(Cipher.DECRYPT_MODE, aesDecryptKey, new IvParameterSpec(iv));
                         byte[] decryptedBytes = decryptionCipher.doFinal(dataInBytes);
-                        
-                        System.out.println(new String(decryptedBytes,"UTF-8"));
-                        //TODO AJOUTER HMAC ET ENVOYER LE SHA1 DE L'AUTRE COTE
+                        String uncipheredMessage = new String(decryptedBytes,"UTF-8");
+
+                        String messageWithNoHMAC = uncipheredMessage.substring(0,uncipheredMessage.length() - 32);
+                        String receivedHMAC = uncipheredMessage.substring(uncipheredMessage.length() - 32); // Extract HMAC
+                        HMACMD5 hmac = new HMACMD5();
+                        String calculatedHMAC = hmac.calculateHMAC(messageWithNoHMAC);
+
+                         if (receivedHMAC.equals(calculatedHMAC)) {
+                            System.out.println("Expéditeur authentifié par HMAC-MD5 : " + messageWithNoHMAC);
+                        } else {
+                            System.out.println("Expéditeur non authentifié !");
+                        }
                     }
                 }else{
                     SHA1Implementation sha1Implementation = new SHA1Implementation();
-                    System.out.println(lastMessage);
-                    System.out.println(receivedMessage);
                     if(sha1Implementation.sha1Hash(lastMessage).equals(receivedMessage)){
-                        System.out.println("Le message est authentique");
+                        System.out.println("Le message est authentique (Hash SHA-1 valide)");
                     }else{
-                        System.out.println("Le message a été modifié!");
+                        System.out.println("Le message a été modifié! (Hash SHA-1 non-valide)");
                     }
                 }
             }  
